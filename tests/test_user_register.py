@@ -2,24 +2,11 @@ import requests
 import pytest
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
-from datetime import datetime
 
 
 class TestUserRegister(BaseCase):
-    def setup(self):
-        base_part = "learnqa"
-        domain = "example.com"
-        random_part = datetime.now().strftime("%m%d%Y%H%M%S")
-        self.email = f"{base_part}{random_part}@{domain}"
-
     def test_create_user_successfully(self):
-        data = {
-            'password': '123',
-            'username': 'learnqa',
-            'firstName': 'learnqa',
-            'lastName': 'learnqa',
-            'email': self.email
-        }
+        data = self.prepare_registration_data()
 
         response = requests.post("https://playground.learnqa.ru/api/user/", data=data)
 
@@ -28,13 +15,7 @@ class TestUserRegister(BaseCase):
 
     def test_create_user_with_existing_email(self):
         email = 'vinkotov@example.com'
-        data = {
-            'password': '123',
-            'username': 'learnqa',
-            'firstName': 'learnqa',
-            'lastName': 'learnqa',
-            'email': email
-        }
+        data = self.prepare_registration_data(email)
 
         response = requests.post("https://playground.learnqa.ru/api/user/", data=data)
 
@@ -43,18 +24,13 @@ class TestUserRegister(BaseCase):
 
 # 1. Создание пользователя с некорректным email - без символа @
     def test_create_user_without_at_in_email(self):
-        data = {
-            'password': '12345',
-            'username': 'learnqa',
-            'firstName': 'learnqa',
-            'lastName': 'learnqa',
-            'email': 'mailexample.com'
-        }
+        email = 'mailexample.com'
+        data = self.prepare_registration_data(email)
 
         response = requests.post('https://playground.learnqa.ru/api/user/', data=data)
 
         Assertions.assert_code_status(response, 400)
-        assert response.content.decode("utf-8") == "Invalid email format", "User is not registered. Unexpected email address"
+        assert response.content.decode("utf-8") == "Invalid email format", "User registered with unexpected email address"
 
 # 2. Создание пользователя без указания одного из полей
     reg_data = [
@@ -87,7 +63,7 @@ class TestUserRegister(BaseCase):
         response = requests.post('https://playground.learnqa.ru/api/user/', data=data)
 
         Assertions.assert_code_status(response, 400)
-        assert response.content.decode("utf-8") == f"The value of '{short_name}' field is too short", f"User is not registered. Too short '{short_name}'"
+        assert response.content.decode("utf-8") == f"The value of '{short_name}' field is too short", f"User registered with short name '{short_name}'"
 
 # 4. Создание пользователя с очень длинным именем - длиннее 250 символов
     long_names = [
