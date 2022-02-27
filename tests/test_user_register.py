@@ -100,7 +100,7 @@ class TestUserRegister(BaseCase):
     ]
 
     @pytest.mark.parametrize('data, long_name', long_names)
-    def test_create_user_with_short_name(self, data, long_name):
+    def test_create_user_with_long_name(self, data, long_name):
 
         response = requests.post('https://playground.learnqa.ru/api/user/', data=data)
 
