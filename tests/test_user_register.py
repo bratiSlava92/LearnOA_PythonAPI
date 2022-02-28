@@ -81,4 +81,4 @@ class TestUserRegister(BaseCase):
         response = requests.post('https://playground.learnqa.ru/api/user/', data=data)
 
         Assertions.assert_code_status(response, 400)
-        assert response.content.decode("utf-8") == f"The value of '{long_name}' field is too long", f"User is not registered. Too long '{long_name}'"
+        assert response.content.decode("utf-8") == f"The value of '{long_name}' field is too long", f"User registered with long name'{long_name}'"
